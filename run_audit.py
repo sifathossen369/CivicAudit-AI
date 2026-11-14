@@ -8,6 +8,8 @@ from rich.text import Text
 
 from core.agents.auditor_orchestrator import CivicAuditOrchestrator
 from core.tools.dossier_generator import DossierGeneratorTool
+from core.tools.procurement_parser import ProcurementParserTool
+from core.tools.file_extractor import FileExtractor
 from config import AuditConfig
 
 console = Console()
@@ -32,7 +34,7 @@ def main():
         "--file",
         type=str,
         default=str(AuditConfig.SAMPLES_DIR / "municipal_it_tender_2025.json"),
-        help="Path to tender JSON or text file"
+        help="Path to tender file (.json, .csv, .pdf, .xlsx, .txt)"
     )
     args = parser.parse_args()
 
@@ -46,8 +48,31 @@ def main():
         console.print(f"[red]Error: Tender file not found at {file_path}[/red]")
         return
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        tender_data = json.load(f)
+    ext = file_path.suffix.lower()
+
+    if ext == ".csv":
+        # Direct CSV BOQ parsing
+        items = ProcurementParserTool.parse_from_csv(file_path)
+        tender_data = {
+            "tender_id": f"CSV-{file_path.stem.upper()}",
+            "title": f"Procurement Bill of Quantities ({file_path.name})",
+            "procuring_entity": "Municipal Public Works Department",
+            "items": [it.model_dump() for it in items]
+        }
+    elif ext in [".pdf", ".xlsx", ".xls", ".txt"]:
+        with open(file_path, "rb") as f:
+            file_bytes = f.read()
+        extracted_text = FileExtractor.process_uploaded_file(file_path.name, file_bytes)
+        tender_data = {
+            "tender_id": f"DOC-{file_path.stem.upper()}",
+            "title": f"Procurement Tender Document ({file_path.name})",
+            "procuring_entity": "Public Procurement Authority",
+            "raw_text": extracted_text
+        }
+    else:
+        # Default JSON docket
+        with open(file_path, "r", encoding="utf-8") as f:
+            tender_data = json.load(f)
 
     orchestrator = CivicAuditOrchestrator(step_callback=cli_callback)
     dossier = orchestrator.audit_tender(
@@ -70,6 +95,7 @@ def main():
 
     for f in dossier.findings:
         flag_style = "[bold red]CRITICAL[/bold red]" if f.risk_level == "CRITICAL_RED_FLAG" else ("[yellow]WARNING[/yellow]" if f.risk_level == "SUSPICIOUS_WARNING" else "[green]NORMAL[/green]")
+        gouging_display = f"{'+' if f.gouging_percentage > 0 else ''}{f.gouging_percentage:.1f}%"
         table.add_row(
             f.item_id,
             f.item_name[:32],
@@ -77,7 +103,7 @@ def main():
             f"${f.quoted_unit_price:,.2f}",
             f"${f.fair_market_unit_price:,.2f}",
             f"${f.variance_total:,.2f}",
-            f"+{f.gouging_percentage:.1f}%",
+            gouging_display,
             flag_style
         )
 

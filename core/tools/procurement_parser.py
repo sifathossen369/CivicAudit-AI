@@ -92,7 +92,7 @@ class ProcurementParserTool:
         # Two-pass column detection: Pass 1 identifies specific columns, Pass 2 matches remaining
         for col in df.columns:
             c_str = str(col).lower().strip()
-            c_clean = re.sub(r'[\(\)\[\]\$\€\৳\£\/]', ' ', c_str).strip()
+            c_clean = re.sub(r'[\(\)\[\]\$\€\৳\£\/_\-]', ' ', c_str).strip()
             tokens = c_clean.split()
             
             # 1. Price column detection (Must NOT be total)
