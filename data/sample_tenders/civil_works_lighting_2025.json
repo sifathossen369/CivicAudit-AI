@@ -1,0 +1,40 @@
+{
+  "tender_id": "CIVIL-ENG-2025-412",
+  "title": "East Sector Smart Highway Lighting & Emergency Power System",
+  "procuring_entity": "Municipal Public Works Department",
+  "submission_date": "2025-11-02",
+  "items": [
+    {
+      "item_id": "BOQ-101",
+      "name": "120W High-Lumen Solar LED Street Light Luminaire",
+      "specification": "IP66 Weatherproof with automatic daylight sensor",
+      "category": "Lighting Infrastructure",
+      "quantity": 200,
+      "quoted_unit_price": 280.00
+    },
+    {
+      "item_id": "BOQ-102",
+      "name": "Industrial 50kVA Silent Diesel Generator Set",
+      "specification": "Water-cooled 3-phase automatic transfer switch",
+      "category": "Heavy Equipment",
+      "quantity": 2,
+      "quoted_unit_price": 17500.00
+    },
+    {
+      "item_id": "BOQ-103",
+      "name": "High-Definition Outdoor PTZ Dome Security Camera",
+      "specification": "Optical 30x Zoom with Night Infrared Array",
+      "category": "Surveillance",
+      "quantity": 25,
+      "quoted_unit_price": 420.00
+    },
+    {
+      "item_id": "BOQ-104",
+      "name": "Portland Structural Concrete Cement Bags (50kg)",
+      "specification": "ASTM C150 Type I standard Portland cement",
+      "category": "Raw Construction Materials",
+      "quantity": 1000,
+      "quoted_unit_price": 11.20
+    }
+  ]
+}

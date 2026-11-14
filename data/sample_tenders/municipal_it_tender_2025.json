@@ -1,0 +1,56 @@
+{
+  "tender_id": "MUNI-IT-2025-089",
+  "title": "Smart City Administration IT Infrastructure & Workstation Upgrade",
+  "procuring_entity": "City Central Procurement Directorate",
+  "submission_date": "2025-10-14",
+  "items": [
+    {
+      "item_id": "BOQ-001",
+      "name": "Core i7 Executive Laptop (16GB RAM, 512GB SSD)",
+      "specification": "Commercial Business Grade 14-inch Laptop",
+      "category": "Computing",
+      "quantity": 40,
+      "quoted_unit_price": 2850.00
+    },
+    {
+      "item_id": "BOQ-002",
+      "name": "27-inch IPS Professional Display Monitor",
+      "specification": "1080p Full HD Display, HDMI/DP",
+      "category": "Peripherals",
+      "quantity": 40,
+      "quoted_unit_price": 195.00
+    },
+    {
+      "item_id": "BOQ-003",
+      "name": "High-Back Ergonomic Executive Mesh Office Chair",
+      "specification": "Adjustable Lumbar Support, 3D Armrest",
+      "category": "Furniture",
+      "quantity": 50,
+      "quoted_unit_price": 890.00
+    },
+    {
+      "item_id": "BOQ-004",
+      "name": "High-Speed Gold-Plated 4K HDMI Cable (2-Meter)",
+      "specification": "Braided 4K 60Hz HDMI 2.0 Cable",
+      "category": "Cables & Accessories",
+      "quantity": 60,
+      "quoted_unit_price": 85.00
+    },
+    {
+      "item_id": "BOQ-005",
+      "name": "48-Port Enterprise Gigabit Managed Network Switch",
+      "specification": "Cisco Catalyst Compatible with PoE+ support",
+      "category": "Networking",
+      "quantity": 4,
+      "quoted_unit_price": 1250.00
+    },
+    {
+      "item_id": "BOQ-006",
+      "name": "Departmental Heavy-Duty Monochrome Laser Printer",
+      "specification": "Duplex Network Printing 45ppm",
+      "category": "Office Equipment",
+      "quantity": 6,
+      "quoted_unit_price": 1350.00
+    }
+  ]
+}
