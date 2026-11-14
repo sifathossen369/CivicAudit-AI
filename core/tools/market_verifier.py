@@ -196,8 +196,15 @@ class MarketVerifierTool:
             "source": "Enterprise Networking Standard Pricing Index",
             "evidence": "https://cisco.com/c/en/us/products/switches/pricing"
         },
+        "cat6 cable spool": {
+            "keywords": ["cat6 spool", "cable spool", "network cable spool", "cat6 305m", "spool 305m", "spool (305m)", "utp cable 305m", "305m spool", "cat6 roll", "cat6 drum"],
+            "base_fair_price": 165.0,
+            "range": "$130 - $210 (305m Drum Spool)",
+            "source": "Industrial IT Structured Cabling Wholesale Schedule (305m Spool Roll)",
+            "evidence": "https://anixter.com/structured-cabling/cat6-bulk-spools"
+        },
         "patch cord": {
-            "keywords": ["patch cord", "lan cable", "cat6 patch", "ethernet cable", "rj45 cable"],
+            "keywords": ["patch cord", "rj45 patch", "lan patch cord", "patch cable 1m", "patch cable 2m", "patch cable 3m"],
             "base_fair_price": 4.50,
             "range": "$2.50 - $7.50",
             "source": "Industrial IT Cabling Wholesale Master Index",
@@ -365,7 +372,16 @@ class MarketVerifierTool:
             )
             return False
 
-        # 3. Low-Cost Consumable Sanity Check (<= $20.0, e.g. patch cord, concrete block, brick):
+        # 3. Bulk Spool & High-Quantity Pack Items ($100 to $2,000, e.g. Cat6 305m spool, 1km fiber roll):
+        # Prevent web scrapers returning $5-$15 single patch cables
+        if quoted_price >= 100.0 and scraped_price < 35.0:
+            logger.warning(
+                f"Forensic Sanity Guard: Scraped price ${scraped_price:,.2f} rejected for bulk/spool asset "
+                f"(quoted ${quoted_price:,.2f}). Accessory / short patch cable noise detected."
+            )
+            return False
+
+        # 4. Low-Cost Consumable Sanity Check (<= $20.0, e.g. patch cord, concrete block, brick):
         if quoted_price <= 20.0 and (scraped_price > 350.0 or scraped_price > quoted_price * 25.0):
             logger.warning(
                 f"Forensic Sanity Guard: Scraped price ${scraped_price:,.2f} rejected for low-cost unit item "
@@ -598,6 +614,9 @@ class MarketVerifierTool:
                     # Keyword Collision Magnitude Guard:
                     # Prevent $1.75 paving block matching $88,000 asphalt paver machine
                     if quoted_unit_price > 5000.0 and base_price < 200.0:
+                        continue
+                    if quoted_unit_price >= 100.0 and base_price < 20.0:
+                        # Prevent bulk cable spools/drums ($150-$500) matching $4.50 single patch cords
                         continue
                     if quoted_unit_price > 0 and quoted_unit_price < 20.0 and base_price > 500.0:
                         continue

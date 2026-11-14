@@ -10,7 +10,7 @@ load_dotenv(BASE_DIR / ".env")
 
 class AuditConfig:
     PROJECT_NAME: str = "CivicAudit AI"
-    VERSION: str = "3.4.0-Production"
+    VERSION: str = "3.5.0-Production"
     TAGLINE: str = "Autonomous Public Procurement & Multi-Agent Forensic Auditor"
     
     # Paths

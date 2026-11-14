@@ -3,12 +3,14 @@ from core.models import ProcurementLineItem, MarketBenchmark, AgentDebateTurn
 
 class MultiAgentPriceCouncil:
     """
-    Multi-Agent Consensus & Deliberation Engine.
+    Statutory Multi-Agent Consensus & Deliberation Engine.
     
-    Orchestrates a 3-agent forensic debate for each line item:
-    1. Agent Scout (🕵️‍♂️): Gathers objective market telemetry & price floor.
-    2. Agent Advocate (💼): Represents commercial reality, supplier overhead, and warranty margins.
-    3. Lead Auditor (⚖️): Evaluates arguments against procurement statutes and issues the binding consensus.
+    Orchestrates an adversarial 3-agent forensic debate for each line item using
+    reproducible, deterministic statutory procurement rules (PPR, FAR, PWD Schedule)
+    to eliminate LLM hallucination risks in high-stakes legal auditing:
+    1. Agent Scout (🕵️‍♂️): Gathers objective wholesale market telemetry & price floor.
+    2. Agent Advocate (💼): Represents commercial reality, statutory taxes (VAT, AIT), and warranty margins (+25% cushion).
+    3. Lead Auditor (⚖️): Evaluates arguments against procurement statutes and issues the binding consensus (+22% ceiling).
     """
 
     @classmethod

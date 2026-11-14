@@ -834,8 +834,8 @@ def save_settings(data: SettingsPayload):
             "active_brain": LLMClient.get_active_provider_name()
         }
     except Exception as e:
-        logger.error(f"Save settings error: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        logger.error(f"Save settings error: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"error": f"Failed to save settings: {str(e)}"})
 
 @app.post("/api/test_ai")
 def test_ai():
@@ -857,8 +857,12 @@ def index():
 @app.get("/api/audit")
 def execute_audit(sample: str = "municipal_it_tender_2025.json"):
     try:
-        sample_path = AuditConfig.SAMPLES_DIR / sample
-        if not sample_path.exists():
+        # Security hardening: Prevent path traversal by isolating basename and enforcing directory boundary
+        clean_filename = Path(sample).name
+        sample_path = (AuditConfig.SAMPLES_DIR / clean_filename).resolve()
+        samples_dir_resolved = AuditConfig.SAMPLES_DIR.resolve()
+
+        if not sample_path.is_relative_to(samples_dir_resolved) or not sample_path.exists():
             sample_path = AuditConfig.SAMPLES_DIR / "municipal_it_tender_2025.json"
 
         logs = []
@@ -867,11 +871,11 @@ def execute_audit(sample: str = "municipal_it_tender_2025.json"):
 
         orchestrator = CivicAuditOrchestrator(step_callback=log_capture)
 
-        if sample.endswith(".csv"):
+        if sample_path.suffix.lower() == ".csv":
             items = ProcurementParserTool.parse_from_csv(sample_path)
             tender_data = {
-                "tender_id": "CSV-TND-2025",
-                "title": "Government Bill of Quantities Spreadsheet (CSV)",
+                "tender_id": f"CSV-{sample_path.stem.upper()}",
+                "title": f"Government Bill of Quantities ({sample_path.name})",
                 "procuring_entity": "Municipal Public Works Department",
                 "items": [it.model_dump() for it in items]
             }
@@ -895,7 +899,7 @@ def execute_audit(sample: str = "municipal_it_tender_2025.json"):
         })
     except Exception as e:
         logger.error(f"Audit error: {e}", exc_info=True)
-        return JSONResponse(status_code=500, content={"error": str(e), "traceback": traceback.format_exc()})
+        return JSONResponse(status_code=500, content={"error": f"Audit execution failed: {str(e)}"})
 
 @app.post("/api/audit_custom")
 def execute_custom_audit(req: CustomTenderRequest):
@@ -928,7 +932,7 @@ def execute_custom_audit(req: CustomTenderRequest):
         })
     except Exception as e:
         logger.error(f"Custom audit error: {e}", exc_info=True)
-        return JSONResponse(status_code=500, content={"error": str(e), "traceback": traceback.format_exc()})
+        return JSONResponse(status_code=500, content={"error": f"Custom audit execution failed: {str(e)}"})
 
 @app.post("/api/upload_tender")
 def upload_and_audit(req: FileUploadRequest):
@@ -936,6 +940,10 @@ def upload_and_audit(req: FileUploadRequest):
     Synchronous threadpool endpoint: Handles large uploads safely without event-loop blocking.
     """
     try:
+        # Security hardening: Reject payloads larger than 25MB (approx 35MB base64)
+        if len(req.file_base64) > 35 * 1024 * 1024:
+            return JSONResponse(status_code=413, content={"error": "Uploaded file exceeds the maximum 25MB security limit."})
+
         logs = []
         def log_capture(phase, msg, data=None):
             logs.append(f"[{phase}] {msg}")
@@ -985,7 +993,7 @@ def upload_and_audit(req: FileUploadRequest):
         })
     except Exception as e:
         logger.error(f"Upload and audit error: {e}", exc_info=True)
-        return JSONResponse(status_code=500, content={"error": str(e), "traceback": traceback.format_exc()})
+        return JSONResponse(status_code=500, content={"error": f"Document processing failed: {str(e)}"})
 
 if __name__ == "__main__":
     print(f"Starting CivicAudit AI Web Platform on http://127.0.0.1:8000 ...")
